@@ -1,52 +1,57 @@
-# WAAI — WhatsApp AI Agent for Nigerian SMEs
+# botjara — WhatsApp AI Agent for Nigerian SMEs
 
 A production-ready WhatsApp AI agent backend that automates customer conversations, order capture, and payments for Nigerian restaurants and SMEs.
 
 ## What's Built (Week 1–4)
 
-| Module | Status |
-|--------|--------|
-| Node.js + TypeScript + Express | ✅ |
-| MongoDB Atlas (7 schemas) | ✅ |
-| WhatsApp Cloud API webhook | ✅ |
-| Message routing & tenant resolution | ✅ |
-| GPT-4o-mini AI with restaurant system prompt | ✅ |
-| Conversation memory (last 10 messages) | ✅ |
-| Voice note transcription (Whisper) | ✅ |
-| Order capture & management | ✅ |
-| Paystack payment link generation | ✅ |
-| Payment webhook (auto confirms orders) | ✅ |
-| Owner WhatsApp notifications | ✅ |
-| Human handoff (customer → owner) | ✅ |
-| Menu CRUD API | ✅ |
-| Delivery/pickup flow | ✅ |
-| Docker + docker-compose | ✅ |
+| Module                                       | Status |
+| -------------------------------------------- | ------ |
+| Node.js + TypeScript + Express               | ✅     |
+| MongoDB Atlas (7 schemas)                    | ✅     |
+| WhatsApp Cloud API webhook                   | ✅     |
+| Message routing & tenant resolution          | ✅     |
+| GPT-4o-mini AI with restaurant system prompt | ✅     |
+| Conversation memory (last 10 messages)       | ✅     |
+| Voice note transcription (Whisper)           | ✅     |
+| Order capture & management                   | ✅     |
+| Paystack payment link generation             | ✅     |
+| Payment webhook (auto confirms orders)       | ✅     |
+| Owner WhatsApp notifications                 | ✅     |
+| Human handoff (customer → owner)             | ✅     |
+| Menu CRUD API                                | ✅     |
+| Delivery/pickup flow                         | ✅     |
+| Docker + docker-compose                      | ✅     |
 
 ## Quick Start
 
 ### 1. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Set up environment variables
+
 ```bash
 cp .env.example .env
 # Fill in all values in .env
 ```
 
 ### 3. Required API keys
+
 - **MongoDB Atlas** — create free cluster at mongodb.com
 - **OpenAI** — get key at platform.openai.com
 - **Paystack** — get keys at paystack.com
 - **Meta WhatsApp Cloud API** — set up at developers.facebook.com
 
 ### 4. Seed test data
+
 ```bash
 npm run seed
 ```
 
 ### 5. Run in development
+
 ```bash
 npm run dev
 ```
@@ -66,6 +71,7 @@ Server starts on `http://localhost:3000`
 7. Subscribe to `messages` webhook field
 
 > For local testing, use [ngrok](https://ngrok.com) to expose localhost:
+>
 > ```bash
 > ngrok http 3000
 > # Copy the https URL and use as webhook URL in Meta
@@ -76,28 +82,31 @@ Server starts on `http://localhost:3000`
 ## API Endpoints
 
 ### Webhooks (Meta + Paystack call these)
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/webhook/whatsapp` | Meta webhook verification |
-| POST | `/webhook/whatsapp` | Incoming WhatsApp messages |
-| POST | `/webhook/paystack` | Paystack payment events |
+
+| Method | Path                | Description                |
+| ------ | ------------------- | -------------------------- |
+| GET    | `/webhook/whatsapp` | Meta webhook verification  |
+| POST   | `/webhook/whatsapp` | Incoming WhatsApp messages |
+| POST   | `/webhook/paystack` | Paystack payment events    |
 
 ### Orders (Dashboard)
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/orders?tenantId=xxx` | Get all orders |
-| GET | `/api/orders/:id` | Get single order |
-| PATCH | `/api/orders/:id/status` | Update order status |
+
+| Method | Path                       | Description         |
+| ------ | -------------------------- | ------------------- |
+| GET    | `/api/orders?tenantId=xxx` | Get all orders      |
+| GET    | `/api/orders/:id`          | Get single order    |
+| PATCH  | `/api/orders/:id/status`   | Update order status |
 
 ### Menu (Dashboard)
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/menus?tenantId=xxx` | Get full menu |
-| POST | `/api/menus` | Create menu item |
-| PATCH | `/api/menus/:id` | Update menu item |
-| PATCH | `/api/menus/:id/toggle` | Toggle availability |
-| DELETE | `/api/menus/:id` | Delete menu item |
-| POST | `/api/menus/bulk-availability` | Bulk toggle |
+
+| Method | Path                           | Description         |
+| ------ | ------------------------------ | ------------------- |
+| GET    | `/api/menus?tenantId=xxx`      | Get full menu       |
+| POST   | `/api/menus`                   | Create menu item    |
+| PATCH  | `/api/menus/:id`               | Update menu item    |
+| PATCH  | `/api/menus/:id/toggle`        | Toggle availability |
+| DELETE | `/api/menus/:id`               | Delete menu item    |
+| POST   | `/api/menus/bulk-availability` | Bulk toggle         |
 
 ---
 

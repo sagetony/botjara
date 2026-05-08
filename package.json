@@ -1,5 +1,5 @@
 {
-  "name": "waai-backend",
+  "name": "botjara",
   "version": "1.0.0",
   "description": "WhatsApp AI Agent for Nigerian SMEs",
   "main": "dist/index.js",

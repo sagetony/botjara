@@ -17,10 +17,10 @@ const seed = async () => {
   // Create test restaurant
   const tenant = await Tenant.create({
     name: "Mama Tee Kitchen",
-    whatsappNumber: "2348102983659",
-    whatsappPhoneNumberId: "1113334445199548", // replace with real one
+    whatsappNumber: "15556376323",
+    whatsappPhoneNumberId: "1113334445199548",
     whatsappAccessToken:
-      "EAAopvGVSsa8BRedKnHElWDbupKBMBefXu3a85tGQopOHhZCGkSTTC3zKHLsHgsrDo0GsmQlAN5YDhUVZC0FkmdCE5MGrvxUAosnpGvnjmiL8DCJax2X0xWR35G5W4wMOw6ZC5Ow2Sh4aJ66MoGsuHmp4T6pPpcej0uWSEkZA8499j7suZARA9ZAKFhCXJqLe6qykCAWoUcPjRiVK4Ag4DJRMKvarsTaQmHuyxzCdVT0Y0daF8vfRJ11tHAxo4nSvsvV5AiYumjB9Sqk5iV34ZBcO02L", // replace with real one
+      "EAAopvGVSsa8BRZAZAnHPk5RdEISMuGJDfxWM5eMXnJkeeg0Q2GTCFtUdUZCs9CtV9ujHZCiK6JpGZB6r9yUZA1e0asDkwpjb6RJZBDSZAa3Bs7yGf3GUzrTsWcmFythY0zWFx2zDRlfzgKxrMqXGjyvyTzVcAZC97kiCHL3TVNXLkgSZBfA4q1hedsLtbTx8nVPwLf2jzVcEpmOZC6pVLh7bbr22CYTpIyTrEBlRx289AWFtRAimBxmckBo5Hd76LxZAYCLMuz1oYcEL6aLmnYoVgFZAVIXU2BAZDZD",
     ownerPhone: "2348102983659",
     businessAddress: "12 Wuse Zone 5, Abuja",
     description: "The best homemade Nigerian food in Abuja. Fresh daily!",

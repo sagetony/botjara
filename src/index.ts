@@ -19,6 +19,7 @@ import orderRoutes from "./modules/orders/order.routes";
 import menuRoutes from "./modules/menus/menu.routes";
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 
 // ─── SECURITY ─────────────────────────────────────────────

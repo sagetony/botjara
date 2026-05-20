@@ -17,10 +17,10 @@ const seed = async () => {
   // Create test restaurant
   const tenant = await Tenant.create({
     name: "Mama Tee Kitchen",
-    whatsappNumber: "15556376323",
-    whatsappPhoneNumberId: "1113334445199548",
+    whatsappNumber: "2349049107835",
+    whatsappPhoneNumberId: "1122227900972438",
     whatsappAccessToken:
-      "EAAopvGVSsa8BRZAZAnHPk5RdEISMuGJDfxWM5eMXnJkeeg0Q2GTCFtUdUZCs9CtV9ujHZCiK6JpGZB6r9yUZA1e0asDkwpjb6RJZBDSZAa3Bs7yGf3GUzrTsWcmFythY0zWFx2zDRlfzgKxrMqXGjyvyTzVcAZC97kiCHL3TVNXLkgSZBfA4q1hedsLtbTx8nVPwLf2jzVcEpmOZC6pVLh7bbr22CYTpIyTrEBlRx289AWFtRAimBxmckBo5Hd76LxZAYCLMuz1oYcEL6aLmnYoVgFZAVIXU2BAZDZD",
+      "EAAopvGVSsa8BRsGqvula3kNLPNX2wScH8FFiY16rujGTFj5lUhtWQ6FZAxOeyIwpA0EUaMw5nspAyVbTOxC9p8GPNGufnXByHlEZAFrDf9BajfZBqwjnZCeMMFjv77TY4UEUFZC75xCGAASoEqbtILHyqKnP0Wii0qMFZC6QwdgT8Ck88AEZAxlxFUatb2YyfpZAmwZDZD",
     ownerPhone: "2348102983659",
     businessAddress: "12 Wuse Zone 5, Abuja",
     description: "The best homemade Nigerian food in Abuja. Fresh daily!",

@@ -22,7 +22,6 @@ interface CreateOrderInput {
   deliveryFee: number;
 }
 
-// ─── CREATE ORDER ─────────────────────────────────────────
 export const createOrder = async (
   input: CreateOrderInput,
 ): Promise<IOrder | null> => {
@@ -31,19 +30,40 @@ export const createOrder = async (
       `📦 Creating order for tenant ${input.tenantId} with ${input.items.length} items`,
     );
     logger.info(`📦 Order items: ${JSON.stringify(input.items)}`);
+
     const resolvedItems = [];
     let subtotal = 0;
 
     for (const item of input.items) {
-      // Find menu item by name (case-insensitive)
-      const menuItem = await MenuItem.findOne({
+      // Try exact match first, then case-insensitive
+      let menuItem = await MenuItem.findOne({
         tenantId: input.tenantId,
-        name: { $regex: new RegExp(item.name, "i") },
+        name: item.name,
         isAvailable: true,
       });
 
+      // Fallback to case-insensitive search
       if (!menuItem) {
-        logger.warn(`Menu item not found or unavailable: ${item.name}`);
+        menuItem = await MenuItem.findOne({
+          tenantId: input.tenantId,
+          name: { $regex: new RegExp(`^${item.name}$`, "i") },
+          isAvailable: true,
+        });
+      }
+
+      // Fallback to partial match
+      if (!menuItem) {
+        menuItem = await MenuItem.findOne({
+          tenantId: input.tenantId,
+          name: { $regex: new RegExp(item.name, "i") },
+          isAvailable: true,
+        });
+      }
+
+      if (!menuItem) {
+        logger.warn(
+          `Menu item not found or unavailable: ${item.name} — skipping`,
+        );
         continue;
       }
 
@@ -60,18 +80,27 @@ export const createOrder = async (
       });
     }
 
-    if (resolvedItems.length === 0) return null;
+    if (resolvedItems.length === 0) {
+      logger.error("❌ No valid items found for order");
+      return null;
+    }
 
-    const total =
-      subtotal + (input.type === "delivery" ? input.deliveryFee : 0);
+    // Add delivery fee only for delivery orders
+    const deliveryFee = input.type === "delivery" ? input.deliveryFee : 0;
+    const total = subtotal + deliveryFee;
+
+    // Generate order number manually to avoid pre-save hook issues
+    const count = await Order.countDocuments({ tenantId: input.tenantId });
+    const orderNumber = `ORD-${String(count + 1).padStart(4, "0")}`;
 
     const order = await Order.create({
       tenantId: input.tenantId,
       customerId: input.customerId,
       conversationId: input.conversationId,
+      orderNumber,
       items: resolvedItems,
       subtotal,
-      deliveryFee: input.type === "delivery" ? input.deliveryFee : 0,
+      deliveryFee,
       total,
       type: input.type,
       deliveryAddress: input.deliveryAddress,
@@ -96,12 +125,10 @@ export const createOrder = async (
   }
 };
 
-// ─── GET ORDER BY ID ──────────────────────────────────────
 export const getOrderById = async (orderId: string): Promise<IOrder | null> => {
   return Order.findById(orderId).lean() as Promise<IOrder | null>;
 };
 
-// ─── UPDATE ORDER STATUS ──────────────────────────────────
 export const updateOrderStatus = async (
   orderId: string,
   status: IOrder["status"],
@@ -115,7 +142,6 @@ export const updateOrderStatus = async (
   return order;
 };
 
-// ─── GET TENANT ORDERS ────────────────────────────────────
 export const getTenantOrders = async (
   tenantId: string,
   status?: string,
@@ -131,7 +157,6 @@ export const getTenantOrders = async (
     .lean();
 };
 
-// ─── FORMAT ORDER SUMMARY (for WhatsApp message) ──────────
 export const formatOrderSummary = (order: IOrder): string => {
   const lines = order.items.map((item) => {
     const modStr =

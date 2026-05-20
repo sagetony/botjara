@@ -101,7 +101,9 @@ export const processIncomingMessage = async ({
   }
 
   // Check if AI included ORDER_CONFIRMED tag
+  logger.info(`🔍 Full AI reply: ${aiReply?.substring(0, 500)}`);
   const extractedOrder = extractOrderFromReply(aiReply);
+  logger.info(`🔍 Extracted order: ${JSON.stringify(extractedOrder)}`);
   const cleanReply = stripOrderTag(aiReply);
 
   // Send clean reply to customer (without the hidden tag)

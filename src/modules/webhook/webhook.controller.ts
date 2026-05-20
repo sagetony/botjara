@@ -24,23 +24,20 @@ export const verifyWebhook = (req: Request, res: Response): void => {
 // ─── WEBHOOK SIGNATURE VALIDATION ─────────────────────────
 export const validateWebhookSignature = (req: Request): boolean => {
   const signature = req.headers["x-hub-signature-256"] as string;
-
-  // TEMP DEBUG LOG
-  logger.info(`🔍 Signature header: ${signature ? "present" : "MISSING"}`);
-  logger.info(`🔍 Body type: ${typeof req.body}`);
-
   if (!signature) return false;
 
   const appSecret = process.env.WHATSAPP_APP_SECRET as string;
+
+  // Use raw body for signature verification — JSON.stringify can produce different output
+  const rawBody =
+    (req as Request & { rawBody?: string }).rawBody || JSON.stringify(req.body);
+
   const expectedSignature = crypto
     .createHmac("sha256", appSecret)
-    .update(JSON.stringify(req.body))
+    .update(rawBody)
     .digest("hex");
 
   const expected = `sha256=${expectedSignature}`;
-
-  logger.info(`🔍 Expected: ${expected.substring(0, 20)}...`);
-  logger.info(`🔍 Received: ${signature.substring(0, 20)}...`);
 
   try {
     return crypto.timingSafeEqual(

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express from "express";
+import express, { Request } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -12,7 +12,6 @@ import connectDB from "./config/database";
 import { getRedisClient } from "./config/redis";
 import logger from "./utils/logger";
 
-// ─── ROUTES ───────────────────────────────────────────────
 import webhookRoutes from "./modules/webhook/webhook.routes";
 import paymentRoutes from "./modules/payments/payment.routes";
 import orderRoutes from "./modules/orders/order.routes";
@@ -22,7 +21,6 @@ const app = express();
 app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 
-// ─── SECURITY ─────────────────────────────────────────────
 app.use(helmet());
 app.use(
   cors({
@@ -31,7 +29,6 @@ app.use(
   }),
 );
 
-// ─── RATE LIMITING ────────────────────────────────────────
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -39,12 +36,19 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ─── BODY PARSING ─────────────────────────────────────────
-app.use(express.json({ limit: "10mb" }));
+// ─── BODY PARSING WITH RAW BODY CAPTURE ──────────────────
+// Raw body is needed for WhatsApp webhook signature verification
+app.use(
+  express.json({
+    limit: "10mb",
+    verify: (req: Request & { rawBody?: string }, res, buf) => {
+      req.rawBody = buf.toString("utf8");
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
 
-// ─── REQUEST LOGGING ──────────────────────────────────────
 app.use(
   morgan("combined", {
     stream: { write: (message) => logger.info(message.trim()) },
@@ -52,7 +56,6 @@ app.use(
   }),
 );
 
-// ─── HEALTH CHECK ─────────────────────────────────────────
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -63,18 +66,15 @@ app.get("/health", (req, res) => {
   });
 });
 
-// ─── API ROUTES ───────────────────────────────────────────
-app.use("/webhook", webhookRoutes); // WhatsApp + Paystack webhooks
-app.use("/webhook", paymentRoutes); // Paystack webhook lives here too
-app.use("/api/orders", orderRoutes); // Order management (dashboard)
-app.use("/api/menus", menuRoutes); // Menu CRUD (dashboard)
+app.use("/webhook", webhookRoutes);
+app.use("/webhook", paymentRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/menus", menuRoutes);
 
-// ─── 404 HANDLER ──────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// ─── GLOBAL ERROR HANDLER ─────────────────────────────────
 app.use(
   (
     err: Error,
@@ -87,17 +87,14 @@ app.use(
   },
 );
 
-// ─── START ────────────────────────────────────────────────
 const start = async () => {
   try {
     await connectDB();
-
     try {
       await getRedisClient().connect();
     } catch {
       logger.warn("Redis not available — continuing without cache");
     }
-
     app.listen(PORT, () => {
       logger.info(`🚀 botjara Backend running on port ${PORT}`);
       logger.info(`📡 WhatsApp Webhook: POST /webhook/whatsapp`);
